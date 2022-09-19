@@ -11,7 +11,7 @@ Item {
 
     property alias preview: previewText
 
-    property string family: 'Arial'
+    property string family: 'Impact'
     property int pointSize: 12
     property bool italic: false
     property bool bold: false
@@ -22,8 +22,19 @@ Item {
     FontFunctions {
         id: fontDatabase
 
-        property variant sizes: []
         property variant cache: fontDatabase.fonts()
+    }
+
+    Component.onCompleted: {
+        for( let a=0; a < fontDatabase.cache.length; a++ )
+        {
+            const ent = fontDatabase.cache[a];
+            if( ent['family'] === fontSelector.family )
+            {
+                fontListView.positionViewAtIndex(a, ListView.Center);
+                break;
+            }
+        }
     }
 
     Pane {
@@ -85,6 +96,18 @@ Item {
         id: fontSizeView
         clip: true
         model: fontDatabase.cache[ fontListView.currentIndex ]['standardSizes']
+        onModelChanged: {
+            for( let a=0; a < model.length; a++ )
+            {
+                const ent = model[a];
+                if( ent === fontSelector.pointSize )
+                {
+                    fontSizeView.positionViewAtIndex(a, ListView.Center);
+                    break;
+                }
+            }
+        }
+
         delegate: Button {
             flat: true
             width: fontSizeView.width
@@ -138,6 +161,7 @@ Item {
             bottom: parent.bottom
             margins: 5
         }
+        spacing: 5
 
         Button {
             text: qsTr('Select')
